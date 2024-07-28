@@ -24,7 +24,7 @@ with open('./users.yaml', 'r', encoding='utf-8') as file:
 Hasher.hash_passwords(config['credentials'])
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate("ai-roadmap-generator-f6570-firebase-adminsdk-kaovf-292c7ace63.json")
+    cred = credentials.Certificate("firebase-auth.json")
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
