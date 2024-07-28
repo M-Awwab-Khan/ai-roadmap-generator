@@ -19,6 +19,11 @@ credentials:
       logged_in: true
       name: Awwab
       password: $2b$12$ibDL/ZYP1WchV3hpgpjiCeoHkuSdktzISK8FD386SJYd87mKXZsO2
+    fatima:
+      email: fatimajamal@gmail.com
+      logged_in: true
+      name: fatima jamal
+      password: $2b$12$kTOfHT33P2yfTiybSlCA1.uQpqTb4b3YOqGsLFQEMwCAgxAZ3PhWS
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0

@@ -112,9 +112,9 @@ if authentication_status:
     roadmaps = load_roadmaps(username)
 
     roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
-    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=roadmap_options.keys())
+    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=[*roadmap_options.keys(), ''])
 
-    if selected_roadmap_id and selected_roadmap_id != ' ':
+    if selected_roadmap_id and selected_roadmap_id != '':
         selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
 
         # Save the roadmap to PDF
