@@ -95,63 +95,64 @@ try:
     name, authentication_status, username = authenticator.login("main")
 except LoginError as e:
     st.error(e)
+    st.error("try clearing cache and see if it works")
+
+else:
 
 
+    if authentication_status:
+        st.sidebar.title('AI Roadmap Generator')
+        skill = st.sidebar.text_input("Which skill do you want to learn? ")
+        duration = st.sidebar.number_input("Months", step = 1)
 
+        if st.sidebar.button("Generate Roadmap"):
+            user_input = {
+                "skill": skill,
+                "duration": int(duration)
+            }
+            roadmap = generate_roadmap(user_input)
+            # st.write(roadmap)
 
-if authentication_status:
-    st.sidebar.title('AI Roadmap Generator')
-    skill = st.sidebar.text_input("Which skill do you want to learn? ")
-    duration = st.sidebar.number_input("Months", step = 1)
+            pdf_buffer = save_to_pdf(roadmap)
+            save_roadmap_to_db(username, skill, roadmap)
 
-    if st.sidebar.button("Generate Roadmap"):
-        user_input = {
-            "skill": skill,
-            "duration": int(duration)
-        }
-        roadmap = generate_roadmap(user_input)
-        # st.write(roadmap)
+        roadmaps = load_roadmaps(username)
 
-        pdf_buffer = save_to_pdf(roadmap)
-        save_roadmap_to_db(username, skill, roadmap)
+        roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
+        selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=[*roadmap_options.keys(), ''])
 
-    roadmaps = load_roadmaps(username)
+        if selected_roadmap_id and selected_roadmap_id != '':
+            selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
 
-    roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
-    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=[*roadmap_options.keys(), ''])
+            # Save the roadmap to PDF
+            pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
 
-    if selected_roadmap_id and selected_roadmap_id != '':
-        selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
+            st.download_button(
+                label="Download Roadmap as PDF",
+                data=pdf_buffer,
+                file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
+                mime="application/pdf"
+            )
+            st.markdown(selected_roadmap['roadmap'])
 
-        # Save the roadmap to PDF
-        pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
+        authenticator.logout("Logout", "sidebar")
 
-        st.download_button(
-            label="Download Roadmap as PDF",
-            data=pdf_buffer,
-            file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
-            mime="application/pdf"
-        )
-        st.markdown(selected_roadmap['roadmap'])
+    elif authentication_status == False:
+        st.error("Username/password is incorrect")
 
-    authenticator.logout("Logout", "sidebar")
+    elif authentication_status == None:
+        st.warning("Please enter your username and password")
 
-elif authentication_status == False:
-    st.error("Username/password is incorrect")
-
-elif authentication_status == None:
-    st.warning("Please enter your username and password")
-
-if not authentication_status:
-    # Creating a new user registration widget
-    try:
-        (email_of_registered_user,
-        username_of_registered_user,
-        name_of_registered_user) = authenticator.register_user(pre_authorization=False)
-        if email_of_registered_user:
-            st.success('User registered successfully')
-    except RegisterError as e:
-        st.error(e)
+    if not authentication_status:
+        # Creating a new user registration widget
+        try:
+            (email_of_registered_user,
+            username_of_registered_user,
+            name_of_registered_user) = authenticator.register_user(pre_authorization=False)
+            if email_of_registered_user:
+                st.success('User registered successfully')
+        except RegisterError as e:
+            st.error(e)
 
 
 # Saving config file

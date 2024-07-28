@@ -9,6 +9,11 @@ credentials:
       logged_in: true
       name: ahsan
       password: $2b$12$HPYVMRVhvfzV2XQWktltnuCNjRQDuxVU2iBqfvoKi.b.9A7IZTcKu
+    aqib:
+      email: aqib@gmail.com
+      logged_in: false
+      name: Aqib
+      password: $2b$12$98J3Wnh1wGSFGefguLQm2.Zne9./Pogt75DOvgctUir8AErf6Rfka
     arham:
       email: asdkfjsadf@gmail.com
       logged_in: false
