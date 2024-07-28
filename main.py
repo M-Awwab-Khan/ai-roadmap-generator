@@ -89,7 +89,13 @@ def load_roadmaps(user_email):
     return roadmaps
 
 streamlit_analytics.start_tracking()
-name, authentication_status, username = authenticator.login("main")
+
+# Creating a login widget
+try:
+    name, authentication_status, username = authenticator.login("main")
+except LoginError as e:
+    st.error(e)
+
 
 
 
