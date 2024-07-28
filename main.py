@@ -42,10 +42,6 @@ authenticator = stauth.Authenticate(
     config['pre-authorized']
 )
 
-streamlit_analytics.start_tracking()
-
-
-
 def generate_roadmap(user_input):
     prompt = f"Generate a comprehensive roadmap for learning {user_input['skill']} in {user_input['duration']} months. Divide the topics in weeks. Make sure you include projects."
     chat_completion = client.chat.completions.create(
@@ -92,6 +88,7 @@ def load_roadmaps(user_email):
         })
     return roadmaps
 
+streamlit_analytics.start_tracking()
 name, authentication_status, username = authenticator.login("main")
 
 
@@ -107,7 +104,7 @@ if authentication_status:
             "duration": int(duration)
         }
         roadmap = generate_roadmap(user_input)
-        # st.markdown(roadmap)
+        # st.write(roadmap)
 
         pdf_buffer = save_to_pdf(roadmap)
         save_roadmap_to_db(username, skill, roadmap)
@@ -115,9 +112,9 @@ if authentication_status:
     roadmaps = load_roadmaps(username)
 
     roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
-    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=list(roadmap_options.keys()))
+    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=roadmap_options.keys())
 
-    if selected_roadmap_id:
+    if selected_roadmap_id and selected_roadmap_id != ' ':
         selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
 
         # Save the roadmap to PDF

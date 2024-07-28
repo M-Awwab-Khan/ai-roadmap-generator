@@ -4,6 +4,11 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
+    ahsan:
+      email: ahsan@gail.com
+      logged_in: true
+      name: ahsan
+      password: $2b$12$HPYVMRVhvfzV2XQWktltnuCNjRQDuxVU2iBqfvoKi.b.9A7IZTcKu
     arham:
       email: asdkfjsadf@gmail.com
       logged_in: false
@@ -20,12 +25,27 @@ credentials:
       logged_in: false
       name: John Smith
       password: $2b$12$04M4pnAjs7/wwF5mHCXTHeZrCB6VdV1SjDtuo6AC3fVdtRBpKo/ze
+    karima:
+      email: karim@gmai.com
+      logged_in: false
+      name: karim
+      password: $2b$12$8t1zSsCMBw/eF1KrEI4TNeTw8FObFC.AYCmdStiI/2g2cIjhx8vYy
+    khan:
+      email: khan@gmail.com
+      logged_in: false
+      name: khan
+      password: $2b$12$4vPNkSrFQN5RtBC2ef3Xg.GgvxajlD2OkZd76LaCrNJuzsITeofaO
     rbriggs:
       email: rbriggs@gmail.com
       failed_login_attempts: 0
       logged_in: false
       name: Rebecca Briggs
       password: $2b$12$AP47gXdSkrSV6ndUnE2eQ.dvjXIu/piCAPXS8Mb4jtwabrvPyGCtO
+    smrayyan:
+      email: rayyan@gmail.com
+      logged_in: false
+      name: rayyan
+      password: $2b$12$Df.Tx1rbi4sJcjgyCu2J6ek8gofwTGKbrC3CVZsmO97vdG.hL0Biq
 pre-authorized:
   emails:
   - melsby@gmail.com
