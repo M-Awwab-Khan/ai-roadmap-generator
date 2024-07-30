@@ -17,7 +17,7 @@ from streamlit_authenticator.utilities import (CredentialsError,
                                                UpdateError)
 
 
-# Loading config file
+# Load the configuration file
 with open('./users.yaml', 'r', encoding='utf-8') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
@@ -88,86 +88,93 @@ def load_roadmaps(user_email):
         })
     return roadmaps
 
+# Start tracking with Streamlit Analytics
 streamlit_analytics.start_tracking()
-if not st.session_state.get("guest"):
-    name, authentication_status, username = authenticator.login("main")
 
-if st.session_state.get("guest"):
-    name = "Guest"
-    username = "guest"
-    authentication_status = None
-
-if authentication_status or st.session_state.get("guest"):
-    st.sidebar.title('AI Roadmap Generator')
-    skill = st.sidebar.text_input("Which skill do you want to learn? ")
-    duration = st.sidebar.number_input("Months", step = 1)
-
-    if st.sidebar.button("Generate Roadmap"):
-        user_input = {
-            "skill": skill,
-            "duration": int(duration)
-        }
-        roadmap = generate_roadmap(user_input)
-        pdf_buffer = save_to_pdf(roadmap)
-
-        if st.session_state.get("guest"):
-            st.title("Welcome Guest")
-            st.download_button(
-                label="Download Roadmap as PDF",
-                data=pdf_buffer,
-                file_name=f"{user_input['skill']}_roadmap.pdf",
-                mime="application/pdf"
-            )
-            st.markdown(roadmap)
-
-
-
+try:
     if not st.session_state.get("guest"):
-        save_roadmap_to_db(username, skill, roadmap)
-        roadmaps = load_roadmaps(username)
-        roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
-        selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=roadmap_options.keys())
+        name, authentication_status, username = authenticator.login("main")
+except LoginError as e:
+    st.error(e)
+    st.error("Try clearing cache and see if it works")
 
-        if selected_roadmap_id and selected_roadmap_id != ' ':
-            selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
+else:
+    if st.session_state.get("guest"):
+        name = "Guest"
+        username = "guest"
+        authentication_status = None
 
-            # Save the roadmap to PDF
-            pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
-            st.title(f"Welcome {name}")
-            st.download_button(
-                label="Download Roadmap as PDF",
-                data=pdf_buffer,
-                file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
-                mime="application/pdf"
-            )
-            st.markdown(selected_roadmap['roadmap'])
+    if authentication_status or st.session_state.get("guest"):
+        st.sidebar.title('AI Roadmap Generator 🛤️')
+        skill = st.sidebar.text_input("Which skill do you want to learn? 🤓")
+        duration = st.sidebar.number_input("Months 📅", step=1)
+        st.title(f"Welcome {name} 👋")
 
-        authenticator.logout("Logout", "sidebar")
+        if st.sidebar.button("Generate Roadmap 🚀"):
+            user_input = {
+                "skill": skill,
+                "duration": int(duration)
+            }
+            roadmap = generate_roadmap(user_input)
+            pdf_buffer = save_to_pdf(roadmap)
 
-elif authentication_status == False and not st.session_state.get("guest"):
-    st.error("Username/password is incorrect")
+            if st.session_state.get("guest"):
+                st.download_button(
+                    label="Download Roadmap as PDF 📄",
+                    data=pdf_buffer,
+                    file_name=f"{user_input['skill']}_roadmap.pdf",
+                    mime="application/pdf"
+                )
+                st.markdown(roadmap)
+            else:
+                save_roadmap_to_db(username, skill, roadmap)
+                st.success("Your roadmap has been generated and saved! ✅")
 
-elif authentication_status == None:
-    st.warning("Please enter your username and password")
+        if not st.session_state.get("guest"):
+            roadmaps = load_roadmaps(username)
+            roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
+            selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view 📂", options=[*roadmap_options.keys(), ' '])
 
-    if st.button("Continue as Guest"):
-        st.session_state["guest"] = True
-        st.experimental_rerun()
+            if selected_roadmap_id and selected_roadmap_id != ' ':
+                selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
+
+                pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
+                st.download_button(
+                    label="Download Roadmap as PDF 📄",
+                    data=pdf_buffer,
+                    file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
+                    mime="application/pdf"
+                )
+                st.markdown(selected_roadmap['roadmap'])
+
+            authenticator.logout("Logout 🚪", "sidebar")
+        else:
+            if st.sidebar.button("Logout 🚪"):
+                st.session_state['guest'] = False
+                st.experimental_rerun()
+
+    elif authentication_status == False and not st.session_state.get("guest"):
+        st.error("Username/password is incorrect ❌")
+
+    elif authentication_status == None:
+        st.warning("Please enter your username and password 🔑")
+
+        if st.button("Continue as Guest 👤"):
+            st.session_state["guest"] = True
+            st.experimental_rerun()
 
 if not authentication_status and not st.session_state.get("guest"):
     # Creating a new user registration widget
     try:
-        (email_of_registered_user,
-        username_of_registered_user,
-        name_of_registered_user) = authenticator.register_user(pre_authorization=False)
+        email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorization=False)
         if email_of_registered_user:
-            st.success('User registered successfully')
+            st.success('User registered successfully 🎉')
     except RegisterError as e:
         st.error(e)
 
-
-# Saving config file
+# Save the config file
 with open('./users.yaml', 'w', encoding='utf-8') as file:
     yaml.dump(config, file, default_flow_style=False)
 
+# Stop tracking with Streamlit Analytics
 streamlit_analytics.stop_tracking()

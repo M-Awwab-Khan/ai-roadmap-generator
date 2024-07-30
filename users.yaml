@@ -9,16 +9,32 @@ credentials:
       logged_in: false
       name: ahsan
       password: $2b$12$HPYVMRVhvfzV2XQWktltnuCNjRQDuxVU2iBqfvoKi.b.9A7IZTcKu
+    aqib:
+      email: aqib@gmail.com
+      logged_in: false
+      name: Aqib
+      password: $2b$12$98J3Wnh1wGSFGefguLQm2.Zne9./Pogt75DOvgctUir8AErf6Rfka
     arham:
       email: asdkfjsadf@gmail.com
+      failed_login_attempts: 1
       logged_in: false
       name: Arham
       password: $2b$12$CJlXTeGMaWI3lFB5n5tFg.rFfmnWJ5ahMYi9kLQrEuydfs22V3YYS
+    asif:
+      email: asif@gmail.com
+      logged_in: false
+      name: Asif
+      password: $2b$12$F.QTM4b0.fwMWHcfuB4G8eEtwPBslDhPH5uDiBy1.2V2JQrXlRnoe
     awwab:
       email: mawwabkhank2006@gmail.com
-      logged_in: true
+      logged_in: false
       name: Awwab
       password: $2b$12$ibDL/ZYP1WchV3hpgpjiCeoHkuSdktzISK8FD386SJYd87mKXZsO2
+    fatima:
+      email: fatimajamal@gmail.com
+      logged_in: false
+      name: fatima jamal
+      password: $2b$12$kTOfHT33P2yfTiybSlCA1.uQpqTb4b3YOqGsLFQEMwCAgxAZ3PhWS
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0
