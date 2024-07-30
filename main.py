@@ -89,11 +89,15 @@ def load_roadmaps(user_email):
     return roadmaps
 
 streamlit_analytics.start_tracking()
-name, authentication_status, username = authenticator.login("main")
+if not st.session_state.get("guest"):
+    name, authentication_status, username = authenticator.login("main")
 
+if st.session_state.get("guest"):
+    name = "Guest"
+    username = "guest"
+    authentication_status = None
 
-
-if authentication_status:
+if authentication_status or st.session_state.get("guest"):
     st.sidebar.title('AI Roadmap Generator')
     skill = st.sidebar.text_input("Which skill do you want to learn? ")
     duration = st.sidebar.number_input("Months", step = 1)
@@ -104,39 +108,53 @@ if authentication_status:
             "duration": int(duration)
         }
         roadmap = generate_roadmap(user_input)
-        # st.write(roadmap)
-
         pdf_buffer = save_to_pdf(roadmap)
+
+        if st.session_state.get("guest"):
+            st.title("Welcome Guest")
+            st.download_button(
+                label="Download Roadmap as PDF",
+                data=pdf_buffer,
+                file_name=f"{user_input['skill']}_roadmap.pdf",
+                mime="application/pdf"
+            )
+            st.markdown(roadmap)
+
+
+
+    if not st.session_state.get("guest"):
         save_roadmap_to_db(username, skill, roadmap)
+        roadmaps = load_roadmaps(username)
+        roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
+        selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=roadmap_options.keys())
 
-    roadmaps = load_roadmaps(username)
+        if selected_roadmap_id and selected_roadmap_id != ' ':
+            selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
 
-    roadmap_options = {f"{rm['timestamp']} - {rm['skill']}": rm['id'] for rm in roadmaps}
-    selected_roadmap_id = st.sidebar.selectbox("Select a roadmap to view", options=roadmap_options.keys())
+            # Save the roadmap to PDF
+            pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
+            st.title(f"Welcome {name}")
+            st.download_button(
+                label="Download Roadmap as PDF",
+                data=pdf_buffer,
+                file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
+                mime="application/pdf"
+            )
+            st.markdown(selected_roadmap['roadmap'])
 
-    if selected_roadmap_id and selected_roadmap_id != ' ':
-        selected_roadmap = next(rm for rm in roadmaps if rm['id'] == roadmap_options[selected_roadmap_id])
+        authenticator.logout("Logout", "sidebar")
 
-        # Save the roadmap to PDF
-        pdf_buffer = save_to_pdf(selected_roadmap['roadmap'])
-
-        st.download_button(
-            label="Download Roadmap as PDF",
-            data=pdf_buffer,
-            file_name=f"{selected_roadmap['skill']}_roadmap.pdf",
-            mime="application/pdf"
-        )
-        st.markdown(selected_roadmap['roadmap'])
-
-    authenticator.logout("Logout", "sidebar")
-
-elif authentication_status == False:
+elif authentication_status == False and not st.session_state.get("guest"):
     st.error("Username/password is incorrect")
 
 elif authentication_status == None:
     st.warning("Please enter your username and password")
 
-if not authentication_status:
+    if st.button("Continue as Guest"):
+        st.session_state["guest"] = True
+        st.experimental_rerun()
+
+if not authentication_status and not st.session_state.get("guest"):
     # Creating a new user registration widget
     try:
         (email_of_registered_user,

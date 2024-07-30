@@ -6,7 +6,7 @@ credentials:
   usernames:
     ahsan:
       email: ahsan@gail.com
-      logged_in: true
+      logged_in: false
       name: ahsan
       password: $2b$12$HPYVMRVhvfzV2XQWktltnuCNjRQDuxVU2iBqfvoKi.b.9A7IZTcKu
     arham:
